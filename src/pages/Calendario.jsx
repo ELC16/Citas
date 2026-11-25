@@ -3,9 +3,10 @@ const p = n => String(n).padStart(2, '0');
 const NOM = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const $ = n => '$' + Number(n).toFixed(2);
 const fin = c => { const [h, m] = c.horario.slice(11).split(':').map(Number), t = h * 60 + m + (c.duracion_min || 0); return `${p((t / 60) | 0)}:${p(t % 60)}`; };
+const wa = (c, n) => `https://wa.me/${c.celular}?text=${encodeURIComponent(`Hola ${c.nombre || ''}, tu cita en ${n} (${c.servicio}) quedó confirmada para el ${c.horario.slice(8, 10)}/${c.horario.slice(5, 7)} a las ${c.horario.slice(11)}. ¡Te esperamos!`)}`;
 const hoyStr = () => { const d = new Date(); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
 
-export default function Calendario({ citas, onDel }) {
+export default function Calendario({ citas, onDel, negocio }) {
   const [mes, setMes] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
   const [sel, setSel] = useState(hoyStr());
   const y = mes.getFullYear(), m = mes.getMonth();
@@ -16,7 +17,7 @@ export default function Calendario({ citas, onDel }) {
   const fecha = d => `${y}-${p(m + 1)}-${p(d)}`;
   const delDia = (porDia[sel] || []).slice().sort((a, b) => a.horario.localeCompare(b.horario));
   const [sy, sm, sd] = sel.split('-').map(Number);
-  const nav = 'rounded-lg border border-slate-300 px-3 py-1 dark:border-slate-600';
+  const nav = 'rounded-xl border border-violet-200 px-3 py-1';
 
   return (<div>
     <div className="mb-3 flex items-center justify-between">
@@ -30,16 +31,16 @@ export default function Calendario({ citas, onDel }) {
       {Array.from({ length: dias }, (_, i) => i + 1).map(d => {
         const n = (porDia[fecha(d)] || []).length, activo = fecha(d) === sel, esHoy = fecha(d) === hoyStr();
         return (<button key={d} onClick={() => setSel(fecha(d))}
-          className={`relative aspect-square rounded-lg border text-sm ${activo ? 'border-blue-600 bg-blue-600 text-white' : esHoy ? 'border-blue-400' : 'border-slate-200 dark:border-slate-700'}`}>
-          {d}{n > 0 && <span className={`absolute bottom-0.5 right-1 text-[10px] font-bold ${activo ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`}>{n}</span>}
+          className={`relative aspect-square rounded-xl border text-sm ${activo ? 'border-violet-400 bg-violet-300 text-violet-950' : esHoy ? 'border-violet-400' : 'border-violet-100'}`}>
+          {d}{n > 0 && <span className={`absolute bottom-0.5 right-1 text-[10px] font-bold ${activo ? 'text-violet-950' : 'text-violet-700'}`}>{n}</span>}
         </button>);
       })}
     </div>
     <h3 className="mb-2 mt-4 font-semibold capitalize">{new Date(sy, sm - 1, sd).toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
-    {delDia.length ? <ul className="divide-y divide-slate-200 dark:divide-slate-700">
+    {delDia.length ? <ul className="divide-y divide-slate-200">
       {delDia.map(c => <li key={c.id} className="flex items-center justify-between gap-2 py-2 text-sm">
-        <span><b>{c.horario.slice(11)}–{fin(c)}</b> · {c.nombre} · {c.servicio} · {$(c.costo)}</span>
-        <button className="text-red-600" onClick={() => onDel(c.id)}>Cancelar</button></li>)}
+        <span><b>{c.horario.slice(11)}–{fin(c)}</b> · {c.nombre || 'Cliente'} · {c.servicio} · {$(c.costo)}<br /><span className="text-slate-500">📱 {c.celular} · {c.wa === 'enviado' ? '✓ confirmación enviada por WhatsApp' : <>{c.wa === 'error' && '⚠ no se pudo enviar · '}<a className="text-emerald-700 underline" target="_blank" rel="noreferrer" href={wa(c, negocio)}>Confirmar por WhatsApp</a></>}</span></span>
+        <button className="text-rose-600" onClick={() => onDel(c.id)}>Cancelar</button></li>)}
     </ul> : <p className="text-sm text-slate-500">No hay citas este día.</p>}
   </div>);
 }
