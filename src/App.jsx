@@ -13,15 +13,15 @@ export default function App() {
     addEventListener('hashchange', f);
     return () => removeEventListener('hashchange', f);
   }, []);
-  const link = 'text-sm underline text-blue-600 dark:text-blue-400';
+  const link = 'rounded-full bg-white/80 px-4 py-1.5 text-sm font-medium text-violet-800 shadow-sm hover:bg-white';
   const [pag, id] = r;
   return (
-    <div className="min-h-screen bg-slate-100 p-4 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-linear-to-b from-pink-50 via-amber-50 to-sky-50 p-4 text-slate-700">
       <main className={`mx-auto ${pag === 'admin' ? 'max-w-3xl' : 'max-w-xl'}`}>
-        <nav className="mb-3 flex gap-4"><a className={link} href="#/">Buscar negocios</a><a className={link} href="#/admin">Soy un negocio</a></nav>
-        {DEMO && <p className="mb-3 rounded-lg bg-amber-100 p-3 text-sm text-amber-900">Modo demo: negocios de ejemplo y datos guardados solo en este navegador. Contraseña de admin de los negocios de ejemplo: <b>demo1234</b>.</p>}
+        <nav className="mb-4 flex flex-wrap items-center gap-2"><span className="mr-auto text-lg font-bold text-violet-800">💜 Citas cerca de ti</span><a className={link} href="#/">Buscar negocios</a><a className={link} href="#/admin">Soy un negocio</a></nav>
+        {DEMO && <p className="mb-3 rounded-xl bg-amber-100 p-3 text-sm text-amber-900">Modo demo: negocios de ejemplo y datos guardados solo en este navegador. Cuentas de negocio de ejemplo: <b>luna@demo.com</b>, patron@demo.com, sonrisa@demo.com o patitas@demo.com · contraseña <b>demo1234</b>.</p>}
         <Suspense fallback={<p>Cargando…</p>}>
-          {pag === 'negocio' && id ? <Cliente key={id} nid={id} /> : pag === 'admin' ? <Admin key={id || 'x'} nid={id} /> : pag === 'registro' ? <Registro /> : <Directorio />}
+          {pag === 'negocio' && id ? <Cliente key={id} nid={id} /> : pag === 'admin' ? <Admin /> : pag === 'registro' ? <Registro /> : <Directorio />}
         </Suspense>
       </main>
     </div>

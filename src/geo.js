@@ -1,4 +1,5 @@
 export const CATEGORIAS = ['Belleza y peluquería', 'Barbería', 'Salud y consultorios', 'Dental', 'Spa y bienestar', 'Mascotas', 'Automotriz', 'Fitness y deporte', 'Educación', 'Otros'];
+export const tel = t => { const d = String(t ?? '').replace(/\D/g, ''); return d.length === 10 ? '52' + d : /^\d{11,15}$/.test(d) ? d : ''; };
 const rad = x => (x * Math.PI) / 180;
 export const km = (a, b) => { // distancia en línea recta (Haversine)
   const h = Math.sin(rad(b.lat - a.lat) / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(rad(b.lng - a.lng) / 2) ** 2;
