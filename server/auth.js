@@ -7,11 +7,12 @@ export const checkPw = (pw, stored) => {
   const a = kdf(pw, salt, +it), b = Buffer.from(h, 'hex');
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 };
-const sign = (exp, secret) => crypto.createHmac('sha256', secret).update(exp).digest('hex');
-export const makeToken = secret => { const exp = String(Math.floor(Date.now() / 1000) + 8 * 3600); return `${exp}.${sign(exp, secret)}`; };
+const sign = (m, secret) => crypto.createHmac('sha256', secret).update(m).digest('hex');
+// El token lleva el id del negocio: solo sirve para administrar ESE negocio.
+export const makeToken = (nid, secret) => { const m = `${nid}.${Math.floor(Date.now() / 1000) + 8 * 3600}`; return `${m}.${sign(m, secret)}`; };
 export const validToken = (t, secret) => {
-  const [exp, sig] = (t || '').split('.');
-  if (!secret || !sig) return false;
-  const good = sign(exp, secret);
-  return sig.length === good.length && crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(good)) && +exp > Date.now() / 1000;
+  const [nid, exp, sig] = (t || '').split('.');
+  if (!secret || !sig) return 0;
+  const good = sign(`${nid}.${exp}`, secret);
+  return sig.length === good.length && crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(good)) && +exp > Date.now() / 1000 ? +nid : 0;
 };
